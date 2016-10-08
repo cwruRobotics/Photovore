@@ -1,5 +1,5 @@
 /*Photovore Robot Control Code
-  Peyton Turner and Mike Schafer and Nikil Pancha???*/
+  Peyton Turner and Mike Schafer and Nikil Pancha and Marcus Daly*/
 
 
 #include <Servo.h>
@@ -25,14 +25,16 @@ bool stable = false;
 
 void setup() {
   // put your setup code here, to run once:
-  Head.attach(9);  // attaches the servo on pin 9 to the servo Head object
-  Panels.attach(10); // attaches the servo on pin 10 to the servo Panels object
+  Head.attach(7);  // attaches the servo on pin 9 to the servo Head object
+  Panels.attach(6); // attaches the servo on pin 10 to the servo Panels object
   pinMode(4, OUTPUT); // left motor forward
   pinMode(5, OUTPUT); // left motor backward
   pinMode(2, OUTPUT); // right motor forward
   pinMode(3, OUTPUT); // right motor backward
   posPanels = panelLB;
   Panels.write(posPanels);
+
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -60,9 +62,23 @@ void loop() {
   }
 */
 
+/*
+  while(true) {
+    
+    sensorValueLeft = analogRead(sensorPinLeft);
+    sensorValueRight = analogRead(sensorPinRight);
+    
+    Serial.println(sensorValueLeft);
+    Serial.println(sensorValueRight);
+    
+    delay(1000);
+  }
+*/
+
+
 // my attempt at rewriting stuff
   if (!stable) {
-  
+    
     findOptimalRotation(33);
     rotateRobot(33);
     panelVoltage = analogRead(panelVoltagePin);
@@ -94,8 +110,10 @@ void turnRobotRight(long milliseconds) { // turns on the left motor forward for 
   digitalWrite(3, LOW);
 
   digitalWrite(4, HIGH);
+  digitalWrite(3, HIGH);
   delay(milliseconds);
   digitalWrite(4, LOW);
+  digitalWrite(3, LOW);
 }
 
 void turnRobotLeft(long milliseconds) { // turns on the right motor forward for the given number of milliseconds
@@ -106,8 +124,10 @@ void turnRobotLeft(long milliseconds) { // turns on the right motor forward for 
   digitalWrite(3, LOW);
 
   digitalWrite(2, HIGH);
+  digitalWrite(5, HIGH);
   delay(milliseconds);
   digitalWrite(2, LOW);
+  digitalWrite(5, LOW);
 }
 
 void moveRobotAntiBackward(long milliseconds){
@@ -127,6 +147,8 @@ void moveRobotAntiBackward(long milliseconds){
 void findOptimalRotation(int threshold) { 
   sensorValueLeft = analogRead(sensorPinLeft);    // read off the voltage from the left sensor (increased light intensity -> smaller values)
   sensorValueRight = analogRead(sensorPinRight);    // read off the voltage from the right sensor (increased light intensity -> smaller values)
+ 
+  
   while (!approximatelyEqual(sensorValueLeft, sensorValueRight, threshold)) {
     if (sensorValueLeft < sensorValueRight) {   // if there is stronger light intensity to the left of the head rotate left 1 degree
       posHead -= 1;
@@ -137,8 +159,8 @@ void findOptimalRotation(int threshold) {
       delay(headTurnTime);    // waits 15ms for the servo to reach the position
     } else if (sensorValueLeft > sensorValueRight) {   // if there is stronger light intensity to the right of the head rotate right 1 degree
       posHead += 1;
-      if (posHead > 180) { // the angle does not overrun 180 degrees
-        posHead = 180;
+      if (posHead >= 180) { // the angle does not overrun 180 degrees
+        posHead = 179;
       }
       Head.write(posHead);
       delay(headTurnTime);    // waits 15ms for the servo to reach the position
@@ -167,9 +189,10 @@ int optimalInclination() {
 }
 
 void rotateRobot(int threshold) {
-  int goalSensors = (sensorValueLeft + sensorValueRight);
-  int goalPos = posHead;
-  int robotTurnTime = 100; // placeholder for how long to turn
+//  int goalSensors = (sensorValueLeft + sensorValueRight); 
+//  int goalPos = posHead;
+  int robotTurnTime = 50; // placeholder for how long to turn
+  
   while (abs(posHead - 90) > 3) {
     if (posHead > 90) {
       turnRobotRight(robotTurnTime); //we should make this time a function of abs(posHead-90) but need to experiment
