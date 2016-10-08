@@ -101,43 +101,43 @@ boolean approximatelyEqual(int val1, int val2, int threshold) {
 
 void turnRobotRight(long milliseconds) { // turns on the left motor forward for the given number of milliseconds
   /*first ensure all motors are off to avoid shorting*/
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
+  analogWrite(4, 0);
+  analogWrite(5, 0);
+  analogWrite(2, 0);
+  analogWrite(3, 0);
 
-  digitalWrite(4, HIGH);
-  digitalWrite(3, HIGH);
+  analogWrite(4, 150);
+  analogWrite(3, 150);
   delay(milliseconds);
-  digitalWrite(4, LOW);
-  digitalWrite(3, LOW);
+  analogWrite(4, 0);
+  analogWrite(3, 0);
 }
 
 void turnRobotLeft(long milliseconds) { // turns on the right motor forward for the given number of milliseconds
   /*first ensure all motors are off to avoid shorting*/
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
+  analogWrite(4, 0);
+  analogWrite(5, 0);
+  analogWrite(2, 0);
+  analogWrite(3, 0);
 
-  digitalWrite(2, HIGH);
-  digitalWrite(5, HIGH);
+  analogWrite(2, 150);
+  analogWrite(5, 150);
   delay(milliseconds);
-  digitalWrite(2, LOW);
-  digitalWrite(5, LOW);
+  analogWrite(2,  0);
+  analogWrite(5, 0);
 }
 
 void moveRobotAntiBackward(long milliseconds){
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
+  analogWrite(4, 0);
+  analogWrite(5, 0);
+  analogWrite(2, 0);
+  analogWrite(3, 0);
 
-  digitalWrite(2, HIGH);
-  digitalWrite(4, HIGH);
+  analogWrite(3, 100);
+  analogWrite(5, 100);
   delay(milliseconds);
-  digitalWrite(2, LOW);
-  digitalWrite(4, LOW);
+  analogWrite(3, 0);
+  analogWrite(5, 0);
 }
 
 //find optimal direction to travel in and rotate head to that position
