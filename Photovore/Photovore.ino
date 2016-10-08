@@ -31,8 +31,8 @@ void setup() {
   pinMode(5, OUTPUT); // left motor backward
   pinMode(2, OUTPUT); // right motor forward
   pinMode(3, OUTPUT); // right motor backward
-  posPanels = panelLB;
   Panels.write(posPanels);
+  posPanels = panelLB;
 
   Serial.begin(9600);
 }
@@ -42,7 +42,6 @@ void loop() {
   // put your main code here, to run repeatedly:
   sensorValueLeft = analogRead(sensorPinLeft);    // read off the voltage from the left sensor (increased light intensity -> smaller values)
   sensorValueRight = analogRead(sensorPinRight);    // read off the voltage from the rgiht sensor (increased light intensity -> smaller values)
-
   findOptimalRotation(50);
   //head is now in optimal position (sort of not really but hopefully)
   if (approximatelyEqual(stablePosition, posHead, 1)) {    // if the position of the head has not changed, increase the length of stability
@@ -51,7 +50,6 @@ void loop() {
     lengthOfStability = 0;
     stablePosition = posHead;
   }
-
   if (lengthOfStability == 20) {    // if the position of the head has been stable for 20 cycles, align the wheels with the head
     lengthOfStability = 0;
     if (posHead >= 90) {  // if the head is turned right, turn the robot right
@@ -75,15 +73,14 @@ void loop() {
   }
 */
 
-
 // my attempt at rewriting stuff
   if (!stable) {
     
-    findOptimalRotation(33);
-    rotateRobot(33);
-    panelVoltage = analogRead(panelVoltagePin);
-//    panelVoltage = 5;
-    if (panelVoltage < someVoltage) moveRobotAntiBackward(1000L);//move forward for a bit i think
+    findOptimalRotation(30);
+    moveRobot(30);
+    /*panelVoltage = analogRead(panelVoltagePin);
+    panelVoltage = 5;
+    /*if (panelVoltage < someVoltage) moveRobotAntiBackward(1000L);//move forward for a bit i think
     if (panelVoltage >= someVoltage) {
       posPanels = optimalInclination();
       Panels.write(posPanels);
@@ -94,7 +91,7 @@ void loop() {
   } else {
     //Reorient to find voltage
     stable = false;
-    }
+    }*/
   }
 }
 
@@ -154,6 +151,7 @@ void findOptimalRotation(int threshold) {
       posHead -= 1;
       if (posHead < 0) { // the angle does not underrun 0 degrees
         posHead = 0;
+        turnRobotRight(10);
       }
       Head.write(posHead);
       delay(headTurnTime);    // waits 15ms for the servo to reach the position
@@ -161,6 +159,7 @@ void findOptimalRotation(int threshold) {
       posHead += 1;
       if (posHead >= 180) { // the angle does not overrun 180 degrees
         posHead = 179;
+        turnRobotLeft(10);
       }
       Head.write(posHead);
       delay(headTurnTime);    // waits 15ms for the servo to reach the position
@@ -188,21 +187,22 @@ int optimalInclination() {
   return bestAngle;
 }
 
-void rotateRobot(int threshold) {
+void moveRobot(int threshold) {
 //  int goalSensors = (sensorValueLeft + sensorValueRight); 
 //  int goalPos = posHead;
-  int robotTurnTime = 50; // placeholder for how long to turn
+  int robotTurnTime = 10; // placeholder for how long to turn
   
-  while (abs(posHead - 90) > 3) {
+  if (abs(posHead - 90) > 3) {
     if (posHead > 90) {
-      turnRobotRight(robotTurnTime); //we should make this time a function of abs(posHead-90) but need to experiment
-      findOptimalRotation(threshold);
+      turnRobotLeft(robotTurnTime); //we should make this time a function of abs(posHead-90) but need to experiment
     } else if (posHead < 90) {
-      turnRobotLeft(robotTurnTime);
-      findOptimalRotation(threshold);
+      turnRobotRight(robotTurnTime);
     }
+    delay(150);
+  }
+  else {
+    moveRobotAntiBackward(200);
   }
 }
-
 
 
